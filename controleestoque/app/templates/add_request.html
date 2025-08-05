@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Request</title>
+</head>
+<body>
+    <h1>Add Request</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.employee.label }}<br>
+            {{ form.employee }}
+        </p>
+        <p>
+            {{ form.product.label }}<br>
+            {{ form.product }}
+        </p>
+        <p>
+            {{ form.quantity.label }}<br>
+            {{ form.quantity(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+    <h2>Low Stock Products</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Min Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in low_stock_products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.min_quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Last Requests</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in last_requests %}
+            <tr>
+                <td>{{ request.employee.name }}</td>
+                <td>{{ request.product.name }}</td>
+                <td>{{ request.quantity }}</td>
+                <td>{{ request.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

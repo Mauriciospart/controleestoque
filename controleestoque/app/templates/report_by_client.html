@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report by Client</title>
+</head>
+<body>
+    <h1>Report by Client</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+                {% for request in employee.requests %}
+                <tr>
+                    <td>{{ employee.company }}</td>
+                    <td>{{ request.product.name }}</td>
+                    <td>{{ request.quantity }}</td>
+                    <td>{{ request.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Reports</h1>
+    <ul>
+        <li><a href="{{ url_for('report_by_employee') }}">Report by Employee</a></li>
+        <li><a href="{{ url_for('report_by_product') }}">Report by Product</a></li>
+        <li><a href="{{ url_for('report_by_client') }}">Report by Client</a></li>
+    </ul>
+{% endblock %}
