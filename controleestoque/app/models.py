@@ -41,6 +41,7 @@ class Product(db.Model):
     quantity = db.Column(db.Integer)
     min_quantity = db.Column(db.Integer)
     periodicity = db.Column(db.Integer)
+    attachment_filename = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return '<Product {}>'.format(self.name)
@@ -57,12 +58,14 @@ class Request(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     quantity = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime, index=True, default=db.func.now())
     approved = db.Column(db.Boolean, default=False)
 
     employee = db.relationship('Employee', backref='requests')
     product = db.relationship('Product', backref='requests')
+    user = db.relationship('User', backref='requests')
 
     def __repr__(self):
         return '<Request {}>'.format(self.id)

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, TextAreaField, FileField
 from wtforms.validators import DataRequired
 
 class LoginForm(FlaskForm):
@@ -14,6 +14,7 @@ class ProductForm(FlaskForm):
     quantity = IntegerField('Quantity', validators=[DataRequired()])
     min_quantity = IntegerField('Minimum Quantity', validators=[DataRequired()])
     periodicity = IntegerField('Periodicity (days)', validators=[DataRequired()])
+    attachment = FileField('Attachment (Optional)')
     submit = SubmitField('Submit')
 
 from wtforms_sqlalchemy.fields import QuerySelectField

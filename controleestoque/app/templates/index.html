@@ -2,6 +2,13 @@
 
 {% block content %}
     <h1>Dashboard</h1>
+    <div class="btn-group" role="group" aria-label="Time period">
+        <a href="{{ url_for('index', period='7days') }}" class="btn btn-secondary">Last 7 Days</a>
+        <a href="{{ url_for('index', period='30days') }}" class="btn btn-secondary">Last 30 Days</a>
+        <a href="{{ url_for('index', period='90days') }}" class="btn btn-secondary">Last 90 Days</a>
+        <a href="{{ url_for('index', period='all') }}" class="btn btn-secondary">All Time</a>
+    </div>
+    <hr>
     <h2>Low Stock Products</h2>
     <table>
         <thead>

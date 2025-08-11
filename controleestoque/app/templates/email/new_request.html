@@ -1,0 +1,12 @@
+<p>A new material request has been created.</p>
+<p>
+    Request ID: {{ request.id }}<br>
+    Product: {{ request.product.name }}<br>
+    Employee: {{ request.employee.name }}<br>
+    Requested by: {{ request.user.username }}
+</p>
+<p>
+    <a href="{{ url_for('requests', _external=True) }}">
+        View Requests
+    </a>
+</p>

@@ -1,0 +1,9 @@
+Your material request has been returned.
+
+Request ID: {{ request.id }}
+Product: {{ request.product.name }}
+Employee: {{ request.employee.name }}
+
+Please review your request.
+
+View Your Requests: {{ url_for('requests', _external=True) }}

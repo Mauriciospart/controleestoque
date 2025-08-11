@@ -1,18 +1,37 @@
 from app import app, db
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, send_from_directory
 from app.forms import LoginForm, ProductForm, EmployeeForm, RequestForm, PasswordResetRequestForm, ResetPasswordForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.email import send_password_reset_email
+from app.email import send_password_reset_email, send_email
 from app.models import User, Product, Employee, Request, Log
 from markdown import markdown
+
+from datetime import datetime, timedelta
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
+    period = request.args.get('period', 'all')
+
+    if period == '7days':
+        start_date = datetime.utcnow() - timedelta(days=7)
+    elif period == '30days':
+        start_date = datetime.utcnow() - timedelta(days=30)
+    elif period == '90days':
+        start_date = datetime.utcnow() - timedelta(days=90)
+    else:
+        start_date = None
+
+    if start_date:
+        last_requests_query = Request.query.filter(Request.timestamp >= start_date)
+    else:
+        last_requests_query = Request.query
+
     low_stock_products = Product.query.filter(Product.quantity <= Product.min_quantity).all()
-    last_requests = Request.query.order_by(Request.timestamp.desc()).limit(5).all()
-    return render_template('index.html', title='Home', low_stock_products=low_stock_products, last_requests=last_requests)
+    last_requests = last_requests_query.order_by(Request.timestamp.desc()).limit(5).all()
+
+    return render_template('index.html', title='Home', low_stock_products=low_stock_products, last_requests=last_requests, period=period)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -51,7 +70,17 @@ from app.log import add_log
 def add_product():
     form = ProductForm()
     if form.validate_on_submit():
-        product = Product(name=form.name.data, description=form.description.data, quantity=form.quantity.data, min_quantity=form.min_quantity.data, periodicity=form.periodicity.data)
+        filename = None
+        if form.attachment.data:
+            filename = secure_filename(form.attachment.data.filename)
+            form.attachment.data.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        product = Product(name=form.name.data,
+                          description=form.description.data,
+                          quantity=form.quantity.data,
+                          min_quantity=form.min_quantity.data,
+                          periodicity=form.periodicity.data,
+                          attachment_filename=filename)
         db.session.add(product)
         db.session.commit()
         add_log(f'Added product {product.name}')
@@ -150,10 +179,19 @@ def add_request():
         if last_request and last_request.timestamp + timedelta(days=product.periodicity) > datetime.utcnow() and not current_user.is_admin:
             flash('This product can only be requested every {} days.'.format(product.periodicity))
             return redirect(url_for('requests'))
-        request = Request(employee_id=employee.id, product_id=product.id, quantity=form.quantity.data)
+        request = Request(employee_id=employee.id, product_id=product.id, quantity=form.quantity.data, user_id=current_user.id)
         db.session.add(request)
         db.session.commit()
         add_log(f'Added request for {product.name} by {employee.name}')
+
+        # Notify admins
+        admins = User.query.filter_by(is_admin=True).all()
+        for admin in admins:
+            send_email('New Material Request',
+                       recipients=[admin.email],
+                       text_body=render_template('email/new_request.txt', request=request),
+                       html_body=render_template('email/new_request.html', request=request))
+
         flash('Request added successfully.')
         return redirect(url_for('requests'))
     return render_template('add_request.html', form=form)
@@ -176,6 +214,13 @@ def approve_request(id):
     request.product.quantity -= request.quantity
     add_log(f'Approved request {request.id}')
     db.session.commit()
+
+    # Notify requester
+    send_email('Your Material Request has been Approved',
+               recipients=[request.user.email],
+               text_body=render_template('email/request_approved.txt', request=request),
+               html_body=render_template('email/request_approved.html', request=request))
+
     flash('Request approved successfully.')
     return redirect(url_for('requests'))
 
@@ -192,6 +237,13 @@ def delete_request(id):
         req.product.quantity += req.quantity
 
     add_log(f'Deleted request {req.id}')
+
+    # Notify requester
+    send_email('Your Material Request has been Returned',
+               recipients=[req.user.email],
+               text_body=render_template('email/request_returned.txt', request=req),
+               html_body=render_template('email/request_returned.html', request=req))
+
     db.session.delete(req)
     db.session.commit()
     flash('Request deleted successfully and stock updated.')
@@ -232,6 +284,7 @@ def logs():
     logs = Log.query.order_by(Log.timestamp.desc()).all()
     return render_template('logs.html', logs=logs)
 
+import os
 from werkzeug.utils import secure_filename
 
 @app.route('/export_products')
@@ -303,3 +356,8 @@ def reset_password(token):
         flash('Your password has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+@app.route('/uploads/<filename>')
+@login_required
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
