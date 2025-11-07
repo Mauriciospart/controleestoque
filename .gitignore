@@ -1,0 +1,16 @@
+# Environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Instance folder
+/instance/
+/controleestoque/instance/
+
+# Log files
+*.log

@@ -1,0 +1,7 @@
+Your material request has been approved.
+
+Request ID: {{ request.id }}
+Product: {{ request.product.name }}
+Employee: {{ request.employee.name }}
+
+View Your Requests: {{ url_for('requests', _external=True) }}

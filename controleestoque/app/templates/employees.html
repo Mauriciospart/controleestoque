@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Employees</h1>
+    <a href="{{ url_for('add_employee') }}">Add Employee</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees.items %}
+            <tr>
+                <td>{{ employee.name }}</td>
+                <td>{{ employee.company }}</td>
+                <td>
+                    <a href="{{ url_for('edit_employee', id=employee.id) }}">Edit</a>
+                    <a href="{{ url_for('delete_employee', id=employee.id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if employees.has_prev %}
+        <a href="{{ url_for('employees', page=employees.prev_num) }}">Previous</a>
+    {% endif %}
+    {% if employees.has_next %}
+        <a href="{{ url_for('employees', page=employees.next_num) }}">Next</a>
+    {% endif %}
+{% endblock %}
