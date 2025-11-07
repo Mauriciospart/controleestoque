@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('employees') }}">Employees</a>
+        <a href="{{ url_for('requests') }}">Requests</a>
+        <a href="{{ url_for('reports') }}">Reports</a>
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('logs') }}">Logs</a>
+        {% endif %}
+        <a href="{{ url_for('help') }}">Help</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</body>
+</html>
