@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report by Product</title>
+</head>
+<body>
+    <h1>Report by Product</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Employee</th>
+                <th>Quantity</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                {% for request in product.requests %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ request.employee.name }}</td>
+                    <td>{{ request.quantity }}</td>
+                    <td>{{ request.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
