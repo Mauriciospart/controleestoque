@@ -3,7 +3,9 @@
 {% block content %}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Employees</h1>
+        {% if current_user.is_administrador() %}
         <a href="{{ url_for('add_employee') }}" class="btn btn-primary">Add Employee</a>
+        {% endif %}
     </div>
     <table class="table table-striped">
         <thead>
@@ -19,8 +21,10 @@
                 <td>{{ employee.name }}</td>
                 <td>{{ employee.company }}</td>
                 <td>
+                    {% if current_user.is_administrador() %}
                     <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{{ url_for('delete_employee', id=employee.id) }}" class="btn btn-sm btn-danger">Delete</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

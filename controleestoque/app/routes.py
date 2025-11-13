@@ -68,6 +68,9 @@ from app.log import add_log
 @app.route('/add_product', methods=['GET', 'POST'])
 @login_required
 def add_product():
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('products'))
     form = ProductForm()
     if form.validate_on_submit():
         filename = None
@@ -91,6 +94,9 @@ def add_product():
 @app.route('/edit_product/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_product(id):
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('products'))
     product = Product.query.get_or_404(id)
     form = ProductForm(obj=product)
     if form.validate_on_submit():
@@ -108,6 +114,9 @@ def edit_product(id):
 @app.route('/delete_product/<int:id>')
 @login_required
 def delete_product(id):
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('products'))
     product = Product.query.get_or_404(id)
     add_log(f'Deleted product {product.name}')
     db.session.delete(product)
@@ -125,6 +134,9 @@ def employees():
 @app.route('/add_employee', methods=['GET', 'POST'])
 @login_required
 def add_employee():
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('employees'))
     form = EmployeeForm()
     if form.validate_on_submit():
         employee = Employee(name=form.name.data, company=form.company.data)
@@ -138,6 +150,9 @@ def add_employee():
 @app.route('/edit_employee/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_employee(id):
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('employees'))
     employee = Employee.query.get_or_404(id)
     form = EmployeeForm(obj=employee)
     if form.validate_on_submit():
@@ -152,6 +167,9 @@ def edit_employee(id):
 @app.route('/delete_employee/<int:id>')
 @login_required
 def delete_employee(id):
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('employees'))
     employee = Employee.query.get_or_404(id)
     add_log(f'Deleted employee {employee.name}')
     db.session.delete(employee)
@@ -290,6 +308,9 @@ from werkzeug.utils import secure_filename
 @app.route('/export_products')
 @login_required
 def export_products():
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('products'))
     products = Product.query.all()
     df = pd.DataFrame([(p.name, p.description, p.quantity, p.min_quantity, p.periodicity) for p in products], columns=['Name', 'Description', 'Quantity', 'Min Quantity', 'Periodicity'])
     return Response(
@@ -301,6 +322,9 @@ def export_products():
 @app.route('/import_products', methods=['GET', 'POST'])
 @login_required
 def import_products():
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('products'))
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file part')
