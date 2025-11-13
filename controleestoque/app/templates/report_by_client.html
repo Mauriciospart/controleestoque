@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Report by Client</title>
-</head>
-<body>
-    <h1>Report by Client</h1>
-    <table>
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="mb-4">Report by Client</h1>
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Client</th>
@@ -21,11 +18,10 @@
                     <td>{{ employee.company }}</td>
                     <td>{{ request.product.name }}</td>
                     <td>{{ request.quantity }}</td>
-                    <td>{{ request.timestamp }}</td>
+                    <td>{{ request.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
                 </tr>
                 {% endfor %}
             {% endfor %}
         </tbody>
     </table>
-</body>
-</html>
+{% endblock %}

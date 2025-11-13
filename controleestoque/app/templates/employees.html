@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Employees</h1>
-    <a href="{{ url_for('add_employee') }}">Add Employee</a>
-    <table>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Employees</h1>
+        <a href="{{ url_for('add_employee') }}" class="btn btn-primary">Add Employee</a>
+    </div>
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Name</th>
@@ -17,17 +19,30 @@
                 <td>{{ employee.name }}</td>
                 <td>{{ employee.company }}</td>
                 <td>
-                    <a href="{{ url_for('edit_employee', id=employee.id) }}">Edit</a>
-                    <a href="{{ url_for('delete_employee', id=employee.id) }}">Delete</a>
+                    <a href="{{ url_for('edit_employee', id=employee.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('delete_employee', id=employee.id) }}" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% if employees.has_prev %}
-        <a href="{{ url_for('employees', page=employees.prev_num) }}">Previous</a>
-    {% endif %}
-    {% if employees.has_next %}
-        <a href="{{ url_for('employees', page=employees.next_num) }}">Next</a>
-    {% endif %}
+    <nav>
+        <ul class="pagination">
+            {% if employees.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('employees', page=employees.prev_num) }}">Previous</a></li>
+            {% endif %}
+            {% for page_num in employees.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if page_num == employees.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('employees', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if employees.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('employees', page=employees.next_num) }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 {% endblock %}

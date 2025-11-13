@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="mt-4">Manual do Usuário</h1>
-        <hr>
-        <div class="manual-content">
-            {{ content|safe }}
+    <div class="card">
+        <div class="card-header">
+            <h1 class="mt-4">Manual do Usuário</h1>
+        </div>
+        <div class="card-body">
+            <div class="manual-content">
+                {{ content|safe }}
+            </div>
         </div>
     </div>
 {% endblock %}

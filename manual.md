@@ -4,7 +4,7 @@
 
 Bem-vindo ao Sistema de Controle de Estoque (SCE).
 
-O objetivo deste sistema é simplificar e automatizar a gestão de Equipamentos de Proteção Individual (EPIs), garantindo um controle preciso do inventário, agilizando o processo de requisição e fornecendo dados importantes para a tomada de decisão.
+O objetivo deste sistema é simplificar e automatizar a gestão de Equipamentos de Proteção Individual (EPIs), garantindo um controle preciso do inventário, agilizando o processo de requisição e fornecendo dados importantes para a tomada de decisões.
 
 ## 2. Perfis de Usuário
 
@@ -66,7 +66,7 @@ Esta é a operação central do sistema.
     2.  Você deverá fornecer uma justificativa (ex: "Produto incorreto").
     3.  O status mudará para "Devolvida", e o item que estava reservado retornará ao estoque. O requisitante será notificado para corrigir ou excluir a requisição.
 
-## 6. Administração (Apenas para Admins)
+## 6. Administração (Apenas para Administradores)
 
 *   **Produtos:** Gerencie o catálogo de produtos, defina o estoque inicial e o estoque mínimo para alertas. Assim como os funcionários, produtos podem ser desativados para não aparecerem em novas requisições, mas mantendo o histórico.
 *   **Usuários:** Crie, edite e exclua contas de usuário. É aqui que você define o perfil de cada um (Requisitante, Aprovador, Administrador).

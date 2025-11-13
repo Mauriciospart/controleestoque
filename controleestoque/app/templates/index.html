@@ -1,52 +1,70 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Dashboard</h1>
-    <div class="btn-group" role="group" aria-label="Time period">
-        <a href="{{ url_for('index', period='7days') }}" class="btn btn-secondary">Last 7 Days</a>
-        <a href="{{ url_for('index', period='30days') }}" class="btn btn-secondary">Last 30 Days</a>
-        <a href="{{ url_for('index', period='90days') }}" class="btn btn-secondary">Last 90 Days</a>
-        <a href="{{ url_for('index', period='all') }}" class="btn btn-secondary">All Time</a>
+    <h1 class="mb-4">Dashboard</h1>
+    <div class="btn-group mb-4" role="group" aria-label="Time period">
+        <a href="{{ url_for('index', period='7days') }}" class="btn btn-outline-primary {% if period == '7days' %}active{% endif %}">Last 7 Days</a>
+        <a href="{{ url_for('index', period='30days') }}" class="btn btn-outline-primary {% if period == '30days' %}active{% endif %}">Last 30 Days</a>
+        <a href="{{ url_for('index', period='90days') }}" class="btn btn-outline-primary {% if period == '90days' %}active{% endif %}">Last 90 Days</a>
+        <a href="{{ url_for('index', period='all') }}" class="btn btn-outline-primary {% if period == 'all' %}active{% endif %}">All Time</a>
     </div>
-    <hr>
-    <h2>Low Stock Products</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Min Quantity</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in low_stock_products %}
-            <tr>
-                <td>{{ product.name }}</td>
-                <td>{{ product.quantity }}</td>
-                <td>{{ product.min_quantity }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <h2>Last Requests</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Employee</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in last_requests %}
-            <tr>
-                <td>{{ request.employee.name }}</td>
-                <td>{{ request.product.name }}</td>
-                <td>{{ request.quantity }}</td>
-                <td>{{ request.timestamp }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Low Stock Products</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                                <th>Min Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in low_stock_products %}
+                            <tr class="table-danger">
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.quantity }}</td>
+                                <td>{{ product.min_quantity }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Last Requests</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in last_requests %}
+                            <tr>
+                                <td>{{ request.employee.name }}</td>
+                                <td>{{ request.product.name }}</td>
+                                <td>{{ request.quantity }}</td>
+                                <td>{{ request.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
