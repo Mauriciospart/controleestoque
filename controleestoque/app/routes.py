@@ -1,6 +1,6 @@
 from app import app, db
 from flask import render_template, flash, redirect, url_for, request, send_from_directory
-from app.forms import LoginForm, ProductForm, EmployeeForm, RequestForm, PasswordResetRequestForm, ResetPasswordForm
+from app.forms import LoginForm, ProductForm, EmployeeForm, RequestForm, PasswordResetRequestForm, ResetPasswordForm, UserForm, EditUserForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.email import send_password_reset_email, send_email
 from app.models import User, Product, Employee, Request, Log
@@ -176,7 +176,7 @@ def add_request():
         product = form.product.data
         employee = form.employee.data
         last_request = Request.query.filter_by(employee_id=employee.id, product_id=product.id).order_by(Request.timestamp.desc()).first()
-        if last_request and last_request.timestamp + timedelta(days=product.periodicity) > datetime.utcnow() and not current_user.is_admin:
+        if last_request and last_request.timestamp + timedelta(days=product.periodicity) > datetime.utcnow() and not (current_user.is_aprovador() or current_user.is_administrador()):
             flash('This product can only be requested every {} days.'.format(product.periodicity))
             return redirect(url_for('requests'))
         request = Request(employee_id=employee.id, product_id=product.id, quantity=form.quantity.data, user_id=current_user.id)
@@ -184,11 +184,11 @@ def add_request():
         db.session.commit()
         add_log(f'Added request for {product.name} by {employee.name}')
 
-        # Notify admins
-        admins = User.query.filter_by(is_admin=True).all()
-        for admin in admins:
+        # Notify approvers and admins
+        approvers = User.query.filter(User.role.in_(['Aprovador', 'Administrador'])).all()
+        for approver in approvers:
             send_email('New Material Request',
-                       recipients=[admin.email],
+                       recipients=[approver.email],
                        text_body=render_template('email/new_request.txt', request=request),
                        html_body=render_template('email/new_request.html', request=request))
 
@@ -202,7 +202,7 @@ from app.email import send_email
 @login_required
 def approve_request(id):
     request = Request.query.get_or_404(id)
-    if not current_user.is_admin:
+    if not (current_user.is_aprovador() or current_user.is_administrador()):
         flash('You are not authorized to perform this action.')
         return redirect(url_for('requests'))
     request.approved = True
@@ -228,7 +228,7 @@ def approve_request(id):
 @login_required
 def delete_request(id):
     req = Request.query.get_or_404(id)
-    if not current_user.is_admin:
+    if not (current_user.is_administrador() or (req.user_id == current_user.id and not req.approved)):
         flash('You are not authorized to perform this action.')
         return redirect(url_for('requests'))
 
@@ -278,7 +278,7 @@ def report_by_client():
 @app.route('/logs')
 @login_required
 def logs():
-    if not current_user.is_admin:
+    if not current_user.is_administrador():
         flash('You are not authorized to view this page.')
         return redirect(url_for('index'))
     logs = Log.query.order_by(Log.timestamp.desc()).all()
@@ -364,3 +364,60 @@ def reset_password(token):
 @login_required
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/users')
+@login_required
+def users():
+    if not current_user.is_administrador():
+        flash('You are not authorized to view this page.')
+        return redirect(url_for('index'))
+    users = User.query.all()
+    return render_template('users.html', users=users)
+
+@app.route('/add_user', methods=['GET', 'POST'])
+@login_required
+def add_user():
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('index'))
+    form = UserForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data, role=form.role.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        add_log(f'Added user {user.username}')
+        flash('User added successfully.')
+        return redirect(url_for('users'))
+    return render_template('add_user.html', form=form)
+
+@app.route('/edit_user/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_user(id):
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('index'))
+    user = User.query.get_or_404(id)
+    form = EditUserForm(obj=user)
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+        user.role = form.role.data
+        db.session.commit()
+        add_log(f'Edited user {user.username}')
+        flash('User updated successfully.')
+        return redirect(url_for('users'))
+    return render_template('edit_user.html', form=form)
+
+@app.route('/delete_user/<int:id>')
+@login_required
+def delete_user(id):
+    if not current_user.is_administrador():
+        flash('You are not authorized to perform this action.')
+        return redirect(url_for('index'))
+    user = User.query.get_or_404(id)
+    add_log(f'Deleted user {user.username}')
+    db.session.delete(user)
+    db.session.commit()
+    flash('User deleted successfully.')
+    return redirect(url_for('users'))

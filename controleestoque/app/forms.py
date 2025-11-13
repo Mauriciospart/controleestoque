@@ -48,3 +48,20 @@ class ResetPasswordForm(FlaskForm):
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Request Password Reset')
+
+from wtforms import SelectField
+
+class UserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    role = SelectField('Role', choices=[('Requisitante', 'Requisitante'), ('Aprovador', 'Aprovador'), ('Administrador', 'Administrador')], validators=[DataRequired()])
+    submit = SubmitField('Create User')
+
+class EditUserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    role = SelectField('Role', choices=[('Requisitante', 'Requisitante'), ('Aprovador', 'Aprovador'), ('Administrador', 'Administrador')], validators=[DataRequired()])
+    submit = SubmitField('Update User')

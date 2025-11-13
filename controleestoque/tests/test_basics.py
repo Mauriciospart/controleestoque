@@ -50,9 +50,9 @@ class BasicTests(unittest.TestCase):
     @mock.patch('app.email.mail.send')
     def test_low_stock_email(self, mock_send):
         with app.app_context():
-            user = User(username='admin', email='admin@example.com', is_admin=True)
+            user = User(username='admin', email='admin@example.com', role='Administrador')
             user.set_password('admin')
-            requester = User(username='requester', email='requester@example.com')
+            requester = User(username='requester', email='requester@example.com', role='Requisitante')
             requester.set_password('password')
             db.session.add(user)
             db.session.add(requester)
