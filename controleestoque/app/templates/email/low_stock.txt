@@ -1,0 +1,3 @@
+The product {{ product.name }} is low on stock.
+Current quantity: {{ product.quantity }}
+Minimum quantity: {{ product.min_quantity }}

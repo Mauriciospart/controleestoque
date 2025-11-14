@@ -1,0 +1,8 @@
+A new material request has been created.
+
+Request ID: {{ request.id }}
+Product: {{ request.product.name }}
+Employee: {{ request.employee.name }}
+Requested by: {{ request.user.username }}
+
+View Requests: {{ url_for('requests', _external=True) }}
