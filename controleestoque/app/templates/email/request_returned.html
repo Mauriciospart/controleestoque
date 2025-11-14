@@ -1,0 +1,14 @@
+<p>Your material request has been returned.</p>
+<p>
+    Request ID: {{ request.id }}<br>
+    Product: {{ request.product.name }}<br>
+    Employee: {{ request.employee.name }}
+</p>
+<p>
+    Please review your request.
+</p>
+<p>
+    <a href="{{ url_for('requests', _external=True) }}">
+        View Your Requests
+    </a>
+</p>
