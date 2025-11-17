@@ -178,6 +178,12 @@ def add_request():
     if form.validate_on_submit():
         product = form.product.data
         employee = form.employee.data
+
+        # Check for stock availability
+        if product.quantity <= 0:
+            flash(f'Cannot request "{product.name}" as it is out of stock.')
+            return redirect(url_for('main.requests'))
+
         last_request = Request.query.filter_by(employee_id=employee.id, product_id=product.id).order_by(Request.timestamp.desc()).first()
         if last_request and last_request.timestamp + timedelta(days=product.periodicity) > datetime.utcnow() and not current_user.is_admin:
             flash('This product can only be requested every {} days.'.format(product.periodicity))

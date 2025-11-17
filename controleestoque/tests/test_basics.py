@@ -76,5 +76,35 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mock_send.call_count, 2) # One for low stock, one for approval
 
+    def test_cannot_request_out_of_stock_product(self):
+        # Create a user and log in
+        user = User(username='testuser', email='test@example.com')
+        user.set_password('password')
+        db.session.add(user)
+        db.session.commit()
+        self.client.post('/login', data=dict(username='testuser', password='password'), follow_redirects=True)
+
+        # Create an employee and a product with zero quantity
+        employee = Employee(name='Test Employee', company='Test Company')
+        product = Product(name='Out of Stock Product', description='Description', quantity=0, min_quantity=5, periodicity=30)
+        db.session.add(employee)
+        db.session.add(product)
+        db.session.commit()
+
+        # Attempt to request the out-of-stock product
+        response = self.client.post('/add_request', data=dict(
+            employee=employee.id,
+            product=product.id,
+            quantity=1
+        ), follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        # Check if the flash message appears in the response data (with HTML encoding)
+        self.assertIn(b'Cannot request &#34;Out of Stock Product&#34; as it is out of stock.', response.data)
+
+        # Ensure no request was created
+        request = Request.query.filter_by(product_id=product.id).first()
+        self.assertIsNone(request)
+
 if __name__ == "__main__":
     unittest.main()
